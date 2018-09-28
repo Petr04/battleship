@@ -48,25 +48,25 @@ class Field:
 		for ship_type in range(ship_count):
 
 			for ship_copy in range(ship_count - (ship_type - 1)):
-				coords = field_to_coords(self.field)
-				unavailable_coords = near_group(coords)
 
+				first_cell = []
 				while True:
-					first_cell = []
 					for i in range(2):
 						first_cell.append(random.randint(0, size-1))
-					first_cell = tuple(first_cell)
 
-					if first_cell in unavailable_coords:
-						continue
-					else:
+					check = near(first_cell)
+
+					available = True
+					for cell in check:
+						if self.field[cell[0]][cell[1]] == True:
+							available = False
+							break
+
+					if available:
 						break
 
-				self.field[first_cell[0]][first_cell[1]] = True
 				near_cells = near(first_cell)
-
 				for ship_cell in range(ship_type-1):
-					print(near_cells)
 					new_cell = random.choice(list(near_cells))
 					self.field[new_cell[0]][new_cell[1]] = True
 
