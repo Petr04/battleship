@@ -1,6 +1,6 @@
 import random
 
-from convert import field_to_coords
+from convert import *
 
 size = 10
 
@@ -49,36 +49,38 @@ class Field:
 
 			for ship_copy in range(ship_count - (ship_type - 1)):
 
+				coords = field_to_coords(self.field)
 				first_cell = []
 				while True:
 					for i in range(2):
 						first_cell.append(random.randint(0, size-1))
 
-					check = near(first_cell)
+					near_cells = near(first_cell, diagonals=True, base=True) - coords
 
-					available = True
-					for cell in check:
-						if self.field[cell[0]][cell[1]] == True:
-							available = False
-							break
-
-					if available:
+					if len(near_cells) > 0:
 						break
 
-				near_cells = near(first_cell)
+				new_cells = set()
 				for ship_cell in range(ship_type-1):
-					new_cell = random.choice(list(near_cells))
-					self.field[new_cell[0]][new_cell[1]] = True
+					while True:
+						near_cells -= near_group(coords, base=True, diagonals=True)
 
-	def get_cell(self, coord):
-		return self.field[coord[0]][coord[1]]
+						if len(near_cells) > 0:
+							break
+
+					new_cell = random.choice(list(near_cells))
+					new_cells.add(new_cell)
+					near_cells = near_group(new_cells)
+
+				coords.update(new_cells)
+				self.field = coords_to_field(coords, size, size)
 
 	def __repr__(self):
 		ret = ''
 
 		for i in self.field:
 			for j in i:
-				ret += ((' ', 'XX')[j])
+				ret += ((' ', 'X')[j])
 			ret += ('\n')
 
 		return ret
