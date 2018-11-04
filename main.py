@@ -17,6 +17,7 @@ class Field:
 
 		self.all_busy = 0 # Убрать, когда я переделаю рекурсию в цикл
 		self.added = False
+		self.merged = False
 
 	def __repr__(self):
 		field = coords_to_field(self.field)
@@ -38,29 +39,19 @@ class Field:
 
 			for ship_copy in range(ship_count - (ship_type - 1)):
 
-				first = random.choice(list(self.all - near_group(self.field, diagonals=True, base=True))) # Выбирать из доступных
-				# для first может не найтись места
+				self.merged = False
+
+				first = random.choice(list(self.all - near_group(
+					self.field, diagonals=True, base=True))) # Выбирать из доступных
 
 				print(first, ship_type)
 				print('----------')
 
 				new = {first} # Ячейки нового корабля
 
-				# Я каждый раз генерирую всё поле заново, хотя можно просто
-				# попробовать найти другую новую клетку. А если я все перебрал или по
-				# другому признаку видно, что уже не найти такой основы, от
-				# которой можно было бы сгенерировать корабль, то тогда уже
-				# нужно генерировать всё поле заново.
-
-				# Когда нет места, не надо генерировать всё поле заново,
-				# можно просто попытаться найти клетку ещё раз. Как это сделать?
-				# 1) Надо узнать, есть ли такие клетки, если есть - рандомом
-				#    пытаться найти такую, а если нет - генерировать заново
-				#    всё поле.
-				# 2) Получить список доступных клеток, а если он пуст -
-				#    генерировать заново всё поле.
-
 				for ship_cell in range(ship_type-1):
+					self.added = False
+
 					near = near_group(new)
 					print('near: {}'.format(near))
 
@@ -70,11 +61,16 @@ class Field:
 						self.field = set()
 						self.generate()
 
-					new.add(random.choice(list(available)))
+					if not self.added:
+						new.add(random.choice(list(available)))
+						self.added = True
 
-				print('Result: {}'.format(new))
-				self.field |= new
-				print()
+				if not self.merged:
+					print('Result: {}'.format(new))
+					self.field |= new
+					print()
+
+					self.merged = True
 
 	def make_coord(self, str_coord):
 		if len(str_coord) != 2:
@@ -101,3 +97,4 @@ if __name__ == '__main__':
 	f.generate()
 
 	print(f)
+	print('Всего мы зашли в ступор {} раз'.format(f.all_busy-1))
