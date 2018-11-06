@@ -15,9 +15,7 @@ class Field:
 			for j in range(self.y-1):
 				self.all.add((i, j))
 
-		self.all_busy = 0 # Убрать, когда я переделаю рекурсию в цикл
-		self.added = False
-		self.merged = False
+		self.fail = False
 
 	def __repr__(self):
 		field = coords_to_field(self.field)
@@ -32,45 +30,43 @@ class Field:
 
 	def generate(self, ship_count=4):
 
-		self.all_busy += 1
-
 		for ship_type in range(ship_count):
 			ship_type += 1
 
 			for ship_copy in range(ship_count - (ship_type - 1)):
 
-				self.merged = False
+				first_set = list(self.all - near_group(self.field, diagonals=True, base=True))
 
-				first = random.choice(list(self.all - near_group(
-					self.field, diagonals=True, base=True))) # Выбирать из доступных
+				while True:
+					first = random.choice(list(first_set)) # Выбирать из доступных
 
-				print(first, ship_type)
-				print('----------')
+					print(first, ship_type)
+					print('----------')
 
-				new = {first} # Ячейки нового корабля
+					new = {first} # Ячейки нового корабля
 
-				for ship_cell in range(ship_type-1):
-					self.added = False
+					for ship_cell in range(ship_type-1):
+						self.added = False
 
-					near = near_group(new)
-					print('near: {}'.format(near))
+						near = near_group(new)
+						print('near: {}'.format(near))
 
-					available = near - near_group(self.field, base=True, diagonals=True)
-					if len(available) == 0:
-						print('Мы зашли в ступор в {}й раз'.format(self.all_busy))
-						self.field = set()
-						self.generate()
+						available = near - near_group(self.field, base=True, diagonals=True)
+						if len(available) == 0:
+							print('Ступор')
+							self.fail = True
+							break
 
-					if not self.added:
 						new.add(random.choice(list(available)))
-						self.added = True
 
-				if not self.merged:
-					print('Result: {}'.format(new))
-					self.field |= new
-					print()
+					if len(new) == ship_type:
+						break
 
-					self.merged = True
+					first_set.remove(first)
+
+				print('Result: {}'.format(new))
+				self.field |= new
+				print()
 
 	def make_coord(self, str_coord):
 		if len(str_coord) != 2:
@@ -97,4 +93,4 @@ if __name__ == '__main__':
 	f.generate()
 
 	print(f)
-	print('Всего мы зашли в ступор {} раз'.format(f.all_busy-1))
+	print(f.fail)
