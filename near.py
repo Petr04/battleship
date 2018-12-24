@@ -1,4 +1,5 @@
-def near(cell, diagonals=False, base=False, x=10, y=10):
+# Переделать .union() на символы |
+def near(cell, diagonals=False, base=False, x=10, y=10): # Сделать параметры обязательными
 	ret = set()
 	delta = (-1, 0, 1)
 	for i in delta:
