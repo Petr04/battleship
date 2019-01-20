@@ -16,6 +16,17 @@ order = (p1, p2)
 while True:
 	for i in range(2):
 		print('{} ходит'.format(i), end='')
+
 		out = order[i].attack(order[1-i])
+		if out == 3:
+			winner = i
+			break
+
 		print(('Мимо', 'Ранил', 'Убил')[out])
+		print('killed:', order[i].killed)
+		print('target:', order[i].target)
+		print('empty:', order[i].empty)
+
 		input()
+
+print('Победил {}'.format(('p1', 'p2')[winner]))

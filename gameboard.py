@@ -1,4 +1,5 @@
 import random
+import enum
 
 # Поменять на import ...
 from near import *
@@ -73,17 +74,23 @@ class Gameboard:
 				self.field |= new
 				print()
 
-	def attack(self, enemy, x=None, y=None):
-		if (x != None) or (not self.target):
+	def attack(self, enemy):
+		if not self.target:
 			x, y = random.choice(list( enemy.all - (self.killed & self.empty) ))
 		else:
-			x, y = random.choice(list( near_group(self.target, diagonals=False, base=False) - self.empty ))
+			x, y = random.choice(list( near_group(self.target, diagonals=False,
+				base=False) - self.empty ))
 
-		print(' на {}'.format((x, y))) # Для test.py
+		print(' на {}: {}'.format((x, y), (x, y) in enemy.field)) # Для test.py
 
 		if not ({(x, y)} | self.target) - enemy.field:
-			self.killed |= self.target
+			print({(x, y)} | self.target)
+			self.killed |= self.target | {(x, y)}
 			self.target = set()
+
+			if self.killed == enemy.field:
+				return 3 # Победил
+
 			return 2 # Убил
 
 		if (x, y) in enemy.field:
