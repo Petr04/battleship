@@ -74,12 +74,12 @@ class Gameboard:
 				self.field |= new
 				print()
 
-	def attack(self, enemy):
+	def attack(self, enemy): # Протестировать
 		if not self.damaged:
-			x, y = random.choice(list( enemy.all - (self.miss & near_group(self.killed, diagonals=True, base=True)) ))
+			x, y = random.choice(list( enemy.all - (self.miss | near_group(self.killed, diagonals=True, base=True)) ))
 		else:
 			x, y = random.choice(list( near_group(self.damaged, diagonals=False,
-				base=False) - (self.miss & near_group(self.killed, diagonals=True, base=True)) ))
+				base=False) - (self.miss | near_group(self.killed, diagonals=True, base=True)) ))
 
 		print(' на {}: {}'.format((x, y), (x, y) in enemy.field)) # Для test.py
 
@@ -87,8 +87,7 @@ class Gameboard:
 			self.miss.add((x, y))
 			return 0 # Мимо
 
-		if near((x, y), diagonals=False, base=False) & (enemy.field - self.damaged):
-			print(near((x, y), diagonals=False, base=False) - (enemy.field - self.damaged))
+		if near_group(self.damaged, diagonals=False, base=False) & (enemy.field - self.damaged):
 			self.damaged.add((x, y))
 			return 1 # Ранил
 
