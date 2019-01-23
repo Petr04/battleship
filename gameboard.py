@@ -10,8 +10,8 @@ class Gameboard:
 		self.field = set()
 
 		self.killed = set()
-		self.target = set() # Раненый корабль
-		self.empty = set()
+		self.damaged = set() # Раненый корабль
+		self.miss = set()
 
 		self.x = x
 		self.y = y
@@ -75,30 +75,32 @@ class Gameboard:
 				print()
 
 	def attack(self, enemy):
-		if not self.target:
-			x, y = random.choice(list( enemy.all - (self.killed & self.empty) ))
+		if not self.damaged:
+			x, y = random.choice(list( enemy.all - (self.miss & near_group(self.killed, diagonals=True, base=True)) ))
 		else:
-			x, y = random.choice(list( near_group(self.target, diagonals=False,
-				base=False) - self.empty ))
+			x, y = random.choice(list( near_group(self.damaged, diagonals=False,
+				base=False) - (self.miss & near_group(self.killed, diagonals=True, base=True)) ))
 
 		print(' на {}: {}'.format((x, y), (x, y) in enemy.field)) # Для test.py
 
-		if not ({(x, y)} | self.target) - enemy.field:
-			print({(x, y)} | self.target)
-			self.killed |= self.target | {(x, y)}
-			self.target = set()
+		if not (x, y) in enemy.field:
+			self.miss.add((x, y))
+			return 0 # Мимо
 
-			if self.killed == enemy.field:
-				return 3 # Победил
-
-			return 2 # Убил
-
-		if (x, y) in enemy.field:
-			self.target.add((x, y))
+		if near((x, y), diagonals=False, base=False) & (enemy.field - self.damaged):
+			print(near((x, y), diagonals=False, base=False) - (enemy.field - self.damaged))
+			self.damaged.add((x, y))
 			return 1 # Ранил
 
-		self.empty.add((x, y))
-		return 0 # Мимо
+
+		print({(x, y)} | self.damaged)
+		self.killed |= self.damaged | {(x, y)}
+		self.damaged = set()
+
+		if self.killed == enemy.field:
+			return 3 # Победил
+
+		return 2 # Убил
 
 def make_coord(self, str_coord): # a1 -> (0, 0) переместить в main
 	if len(str_coord) != 2:

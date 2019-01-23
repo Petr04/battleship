@@ -17,15 +17,18 @@ while True:
 	for i in range(2):
 		print('{} ходит'.format(i), end='')
 
+
 		out = order[i].attack(order[1-i])
+
+		print(('Мимо', 'Ранил', 'Убил', 'Победил')[out])
+
 		if out == 3:
 			winner = i
 			break
 
-		print(('Мимо', 'Ранил', 'Убил')[out])
 		print('killed:', order[i].killed)
-		print('target:', order[i].target)
-		print('empty:', order[i].empty)
+		print('damaged:', order[i].damaged)
+		print('miss:', order[i].miss)
 
 		input()
 
