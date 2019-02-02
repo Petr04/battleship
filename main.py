@@ -1,5 +1,20 @@
 import gameboard as gb
+import interface as ifc
 import random
+
+def make_coord(self, str_coord): # a1 -> (0, 0)
+	if len(str_coord) != 2:
+		return None
+
+	str_coord = str_coord.lower()
+	ret = (ord(str_coord[0])-97, int(str_coord[1])-1)
+
+	for i in range(len(ret)):
+		if not (0 <= ret[i] <= (self.x, self.y)[i]): # Проверить, нужно ли здесь вычитать 1
+													 # или поставить < вместо <=
+			return None
+
+	return ret
 
 if __name__ == '__main__':
 	players = 2
@@ -19,7 +34,7 @@ if __name__ == '__main__':
 		for i in range(players):
 			if first == 2: # Если ходит пользователь
 				str_coord = input('> ')
-				x, y = gb.make_coord(str_coord)
+				x, y = make_coord(str_coord)
 
 				ret = order[i].attack(order[players-i], x, y)
 				print(('Мимо', 'Ранил', 'Убил')[ret])

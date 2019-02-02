@@ -1,5 +1,4 @@
-# Переделать .union() на символы |
-def near(cell, diagonals=False, base=False, x=10, y=10): # Сделать параметры обязательными
+def near(cell, diagonals, base, x=10, y=10): # Сделать параметры обязательными
 	ret = set()
 	delta = (-1, 0, 1)
 	for i in delta:
@@ -20,10 +19,10 @@ def near(cell, diagonals=False, base=False, x=10, y=10): # Сделать пар
 
 	return ret
 
-def near_group(cells, diagonals=False, base=False):
+def near_group(cells, diagonals, base):
 	ret = set()
 	for cell in cells:
-		ret = ret.union(near(cell, diagonals=diagonals, base=base))
+		ret |= near(cell, diagonals=diagonals, base=base)
 
 	if not base:
 		ret -= set(cells)

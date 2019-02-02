@@ -1,9 +1,7 @@
 import random
-import enum
+from interface import Result
 
-# Поменять на import ...
-from near import *
-from convert import *
+from near import near_group
 
 class Gameboard:
 	def __init__(self, x=10, y=10):
@@ -24,13 +22,15 @@ class Gameboard:
 		self.fail = False # Для информации
 
 	def __repr__(self):
-		field = coords_to_field(self.field)
 		ret = ''
+		for i in range(self.x):
+			for j in range(self.y):
+				if (i, j) in self.field:
+					ret += 'X'
+				else:
+					ret += ' '
 
-		for i in field:
-			for j in i:
-				ret += ((' ', 'X')[j])
-			ret += ('\n')
+			ret += '\n'
 
 		return ret
 
@@ -54,7 +54,7 @@ class Gameboard:
 
 					for ship_cell in range(ship_type-1):
 
-						near = near_group(new)
+						near = near_group(new, base=False, diagonals=False)
 						print('near: {}'.format(near))
 
 						available = near - near_group(self.field, base=True, diagonals=True)
@@ -75,22 +75,23 @@ class Gameboard:
 				print()
 
 	def attack(self, enemy):
+		empty = (self.miss | near_group(self.killed, diagonals=True, base=True))
 		if not self.damaged:
-			x, y = random.choice(list( enemy.all - (self.miss | near_group(self.killed, diagonals=True, base=True)) ))
+			x, y = random.choice(list( enemy.all - empty ))
 		else:
 			x, y = random.choice(list( near_group(self.damaged, diagonals=False,
-				base=False) - (self.miss | near_group(self.killed, diagonals=True, base=True)) ))
+				base=False) - empty ))
 
-		print(' на {}: {}'.format((x, y), (x, y) in enemy.field)) # Для test.py
+		print(' на {}: {}'.format((x, y), (x, y) in enemy.field)) # Для test.py (ходит на ...)
 
 		if not (x, y) in enemy.field:
 			self.miss.add((x, y))
-			return 0 # Мимо
+			return Result.MISS
 
-		self.damaged |= {(x, y)}
+		self.damaged.add((x, y))
 		if len( near_group(self.damaged, diagonals=False, base=False) & enemy.field ) != 0:
 			self.damaged.add((x, y))
-			return 1 # Ранил
+			return Result.DAMAGE
 
 
 		print(self.damaged)
@@ -98,20 +99,6 @@ class Gameboard:
 		self.damaged = set()
 
 		if self.killed == enemy.field:
-			return 3 # Победил
+			return Result.WIN
 
-		return 2 # Убил
-
-def make_coord(self, str_coord): # a1 -> (0, 0) переместить в main
-	if len(str_coord) != 2:
-		return None
-
-	str_coord = str_coord.lower()
-	ret = (ord(str_coord[0])-97, int(str_coord[1])-1)
-
-	for i in range(len(ret)):
-		if not (0 <= ret[i] <= (self.x, self.y)[i]): # Проверить, нужно ли здесь вычитать 1
-													 # или поставить < вместо <=
-			return None
-
-	return ret
+		return Result.KILL

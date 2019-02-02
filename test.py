@@ -1,4 +1,5 @@
 import gameboard as gb
+from interface import Result
 
 p1 = gb.Gameboard()
 p2 = gb.Gameboard()
@@ -20,9 +21,9 @@ while True:
 
 		out = order[i].attack(order[1-i])
 
-		print(('Мимо', 'Ранил', 'Убил', 'Победил')[out])
+		print(out)
 
-		if out == 3:
+		if out == Result.WIN:
 			winner = i
 			break
 
