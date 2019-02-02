@@ -10,7 +10,7 @@ class Gameboard:
 		self.field = set()
 
 		self.killed = set()
-		self.damaged = set() # Раненый корабль
+		self.damaged = set()
 		self.miss = set()
 
 		self.x = x
@@ -74,7 +74,7 @@ class Gameboard:
 				self.field |= new
 				print()
 
-	def attack(self, enemy): # Протестировать
+	def attack(self, enemy):
 		if not self.damaged:
 			x, y = random.choice(list( enemy.all - (self.miss | near_group(self.killed, diagonals=True, base=True)) ))
 		else:
@@ -87,13 +87,14 @@ class Gameboard:
 			self.miss.add((x, y))
 			return 0 # Мимо
 
-		if near_group(self.damaged, diagonals=False, base=False) & (enemy.field - self.damaged):
+		self.damaged |= {(x, y)}
+		if len( near_group(self.damaged, diagonals=False, base=False) & enemy.field ) != 0:
 			self.damaged.add((x, y))
 			return 1 # Ранил
 
 
-		print({(x, y)} | self.damaged)
-		self.killed |= self.damaged | {(x, y)}
+		print(self.damaged)
+		self.killed |= self.damaged
 		self.damaged = set()
 
 		if self.killed == enemy.field:
