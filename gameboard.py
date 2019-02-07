@@ -1,6 +1,6 @@
 import random
-from interface import Result
 
+from interface import Result
 from near import near_group
 
 class Gameboard:
@@ -36,10 +36,9 @@ class Gameboard:
 
 	def generate(self, ship_count=4):
 
-		for ship_type in range(ship_count):
-			ship_type += 1
+		for ship_type in range(1, ship_count+1):
 
-			for ship_copy in range(ship_count - (ship_type - 1)):
+			for _ in range(ship_count - (ship_type - 1)):
 
 				first_set = list(self.all - near_group(self.field, diagonals=True, base=True))
 				# Потенциальные first
@@ -52,7 +51,7 @@ class Gameboard:
 
 					new = {first} # Ячейки нового корабля
 
-					for ship_cell in range(ship_type-1):
+					for _ in range(ship_type-1):
 
 						near = near_group(new, base=False, diagonals=False)
 						print('near: {}'.format(near))

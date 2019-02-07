@@ -1,5 +1,5 @@
-import gameboard as gb
-import interface as ifc
+from gameboard import Gameboard
+from interface import result
 import random
 
 def make_coord(self, str_coord): # a1 -> (0, 0)
@@ -19,8 +19,8 @@ def make_coord(self, str_coord): # a1 -> (0, 0)
 if __name__ == '__main__':
 	players = 2
 
-	comp = gb.Gameboard()
-	user = gb.Gameboard()
+	comp = Gameboard()
+	user = Gameboard()
 
 	comp.generate()
 	user.input()

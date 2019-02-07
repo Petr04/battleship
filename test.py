@@ -1,8 +1,8 @@
-import gameboard as gb
+from gameboard import Gameboard
 from interface import Result
 
-p1 = gb.Gameboard()
-p2 = gb.Gameboard()
+p1 = Gameboard()
+p2 = Gameboard()
 
 p1.generate()
 p2.generate()
