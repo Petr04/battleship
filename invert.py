@@ -1,5 +1,3 @@
-from gameboard import Gameboard
-
 def invert(field, x=10, y=10):
 	ret = set()
 
@@ -11,6 +9,8 @@ def invert(field, x=10, y=10):
 	return ret
 
 if __name__ == '__main__':
+	from gameboard import Gameboard
+
 	f = {(1, 2), (3, 4)}
 
 	p = Gameboard()

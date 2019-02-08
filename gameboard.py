@@ -1,7 +1,8 @@
-import random
+from random import choice
 
 from interface import Result
 from near import near_group
+from invert import invert
 
 class Gameboard:
 	def __init__(self, x=10, y=10):
@@ -35,50 +36,39 @@ class Gameboard:
 		return ret
 
 	def generate(self, ship_count=4):
+		bad = set()
 
-		for ship_type in range(1, ship_count+1):
+		for ship_type in range(ship_count, 0, -1):
+			ship_instance = 0
+			while ship_instance < ship_count - ship_type + 1:
 
-			for _ in range(ship_count - (ship_type - 1)):
+				first_set = invert(near_group(self.field, base=True, diagonals=True) | bad)
+				if not first_set: # Протестировать
+					self.generate()
+					return
 
-				first_set = list(self.all - near_group(self.field, diagonals=True, base=True))
-				# Потенциальные first
+				new = {choice(list(first_set))}
 
-				while True:
-					first = random.choice(list(first_set)) # Выбирать из доступных
-
-					print(first, ship_type)
-					print('----------')
-
-					new = {first} # Ячейки нового корабля
-
-					for _ in range(ship_type-1):
-
-						near = near_group(new, base=False, diagonals=False)
-						print('near: {}'.format(near))
-
-						available = near - near_group(self.field, base=True, diagonals=True)
-						if len(available) == 0:
-							print('Ступор')
-							self.fail = True
-							break
-
-						new.add(random.choice(list(available)))
-
-					if len(new) == ship_type:
+				for _ in range(ship_type-1):
+					cells = near_group(new, base=False, diagonals=False) - \
+						(bad | near_group(self.field, base=True, diagonals=True))
+					if not cells:
+						ship_instance -= 1
+						bad |= new
+						new.clear()
 						break
 
-					first_set.remove(first)
+					new.add(choice(list(cells)))
 
-				print('Result: {}'.format(new))
 				self.field |= new
-				print()
+				ship_instance += 1
 
 	def attack(self, enemy):
 		empty = (self.miss | near_group(self.killed, diagonals=True, base=True))
 		if not self.damaged:
-			x, y = random.choice(list( enemy.all - empty ))
+			x, y = choice(list( enemy.all - empty ))
 		else:
-			x, y = random.choice(list( near_group(self.damaged, diagonals=False,
+			x, y = choice(list( near_group(self.damaged, diagonals=False,
 				base=False) - empty ))
 
 		print(' на {}: {}'.format((x, y), (x, y) in enemy.field)) # Для test.py (ходит на ...)

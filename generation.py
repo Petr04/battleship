@@ -10,26 +10,29 @@ class NewGameboard(Gameboard):
 		bad = set()
 
 		for ship_type in range(ship_count, 0, -1):
-			for ship_instance in range(ship_count - ship_type + 1):
+			ship_instance = 0
+			while ship_instance < ship_count - ship_type + 1:
 
 				first_set = invert(near_group(self.field, base=True, diagonals=True) | bad)
 				if not first_set: # Протестировать
 					self.generate()
-					print('lol')
 					return
 
 				new = {choice(list(first_set))}
 
-				for ship_cell in range(ship_type):
-					cells = near_group(new, base=False, diagonals=False) - bad
+				for _ in range(ship_type-1):
+					cells = near_group(new, base=False, diagonals=False) - \
+						(bad | near_group(self.field, base=True, diagonals=True))
 					if not cells:
 						ship_instance -= 1
 						bad |= new
+						new.clear()
 						break
 
 					new.add(choice(list(cells)))
 
 				self.field |= new
+				ship_instance += 1
 
 p = NewGameboard()
 p.generate()
