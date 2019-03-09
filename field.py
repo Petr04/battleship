@@ -33,45 +33,28 @@ class Field:
 
 		return True
 
-	# Протестировать и исправить повторяющийся код
-	def __and__(self, other):
+	def __logic(self, other, operation):
 		if (self.x, self.y) != (other.x, other.y):
-			raise DifferentSize
+			raise DifferentSize("""a, b in a {} b must have same size, but \
+a is {}x{}, b is {}x{}""".format(operation, self.x, self.y, other.x, other.y))
 
 		ret = Field(self.x, self.y)
 
 		for i in range(self.x):
-			ret.field.append([])
+
 			for j in range(self.y):
-				ret.field[i].append(self.field[i] & self.field[j])
+				ret.field[i][j] = eval('self.field[i][j] {} other.field[i][j]'.format(operation))
 
 		return ret
+
+	def __and__(self, other):
+		return self.__logic(other, '&')
 
 	def __or__(self, other):
-		if (self.x, self.y) != (other.x, other.y):
-			raise DifferentSize
-
-		ret = Field(self.x, self.y)
-
-		for i in range(self.x):
-			ret.field.append([])
-			for j in range(self.y):
-				ret.field[i].append(self.field[i] | self.field[j])
-
-		return ret
+		return self.__logic(other, '|')
 
 	def __xor__(self, other):
-		if (self.x, self.y) != (other.x, other.y):
-			raise DifferentSize
-
-		ret = Field(self.x, self.y)
-
-		for i in range(self.x):
-			ret.field.append([])
-			for j in range(self.y):
-				ret.field[i].append(self.field[i] ^ self.field[j])
-
-		return ret
+		return self.__logic(other, '^')
 
 	def elements(self):
 		ret = set()
@@ -83,5 +66,31 @@ class Field:
 
 		return ret
 
-f = Field(10, 10, {(1, 1), (2, 2), (3, 3), (3, 4)})
+	def near(self, base, diagonals):
+		# Не работает
+		ret = Field(self.x, self.y)
+
+		for i in range(self.x):
+			for j in range(self.y):
+				if self.field[i][j]:
+					delta = (-1, 0, 1)
+
+					for di in delta:
+						for dj in delta:
+							if not( (not diagonals) and (not 0 in (i, j)) ):
+								if not( (not base) and all(d == 0 for d in (di, dj)) ):
+									within = True
+									check = zip((i, j), (self.x, self.y))
+									for c in check:
+										if not( 0 <= c[0] <= c[1] ):
+											within = False
+
+									if within:
+										ret.field[i][j] = True
+
+		return ret
+
+f = Field(10, 10, {(1, 1), (1, 2), (3, 4), (4, 4), (4, 3), (0, 6)})
 print(f)
+print('=====')
+print(f.near(base=False, diagonals=False))
