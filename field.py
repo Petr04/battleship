@@ -1,27 +1,26 @@
 from near import near
+from numpy import full
 
 class DifferentSize(Exception):
 	pass
 
 class Field:
-	def __init__(self, x, y, elements={None}):
+	def __init__(self, x, y, elements=set()):
 		self.x = x
 		self.y = y
 
-		self.field = []
-
-		for i in range(self.x):
-			self.field.append([])
-
-			for j in range(y):
-				self.field[i].append((i, j) in elements)
+		self.field = full((self.x, self.y), False)
+		if elements:
+			for i in range(self.x):
+				for j in range(self.y):
+					self.field[i][j] = (i, j) in elements
 
 	def __str__(self):
 		ret = ''
 
 		for i in self.field:
 			for j in i:
-				ret += (' ', 'X')[j]
+				ret += (' ', 'X')[int(j)]
 			ret += '\n'
 
 		return ret
