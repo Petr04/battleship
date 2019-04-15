@@ -74,18 +74,21 @@ a is {}x{}, b is {}x{}""".format(operation, self.x, self.y, other.x, other.y))
 				if self.field[i][j]:
 					delta = (-1, 0, 1)
 
-					for di in delta:
-						for dj in delta:
+					for delta_i in delta:
+						for delta_j in delta:
 							if not( (not diagonals) and (not 0 in (i, j)) ):
-								if not( (not base) and all(d == 0 for d in (di, dj)) ):
+								if not( (not base) and all(d == 0 for d in (delta_i, delta_j)) ):
+									near_i = i + delta_i
+									near_j = j + delta_j
+
 									within = True
-									check = zip((i, j), (self.x, self.y))
+									check = zip((near_i, near_j), (self.x, self.y))
 									for c in check:
 										if not( 0 <= c[0] <= c[1] ):
 											within = False
 
 									if within:
-										ret.field[i][j] = True
+										ret.field[near_i][near_j] = True
 
 		return ret
 
