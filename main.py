@@ -1,44 +1,36 @@
 from gameboard import Gameboard
-from interface import result
-import random
+from result import Result
 
-def make_coord(self, str_coord): # a1 -> (0, 0)
-	if len(str_coord) != 2:
-		return None
+p1 = Gameboard()
+p2 = Gameboard()
 
-	str_coord = str_coord.lower()
-	ret = (ord(str_coord[0])-97, int(str_coord[1])-1)
+p1.generate()
+p2.generate()
 
-	for i in range(len(ret)):
-		if not (0 <= ret[i] <= (self.x, self.y)[i]): # Проверить, нужно ли здесь вычитать 1
-													 # или поставить < вместо <=
-			return None
+print('\n' * 8)
 
-	return ret
+print('p1\n', p1)
+print('p2\n', p2)
 
-if __name__ == '__main__':
-	players = 2
+order = (p1, p2)
 
-	comp = Gameboard()
-	user = Gameboard()
+while True:
+	for i in range(2):
+		print('{} ходит'.format(i), end='')
 
-	comp.generate()
-	user.input()
 
-	first = random.randint(players)
-	order = ((comp, user)[first], (comp, user)[players-first])
+		out = order[i].attack(order[1-i])
 
-	print('Первым ходит{}'.format((' компьютер', 'е вы')[first]))
+		print(out)
 
-	while True:
-		for i in range(players):
-			if first == 2: # Если ходит пользователь
-				str_coord = input('> ')
-				x, y = make_coord(str_coord)
+		if out == Result.WIN:
+			winner = i
+			break
 
-				ret = order[i].attack(order[players-i], x, y)
-				print(('Мимо', 'Ранил', 'Убил')[ret])
-			else:
-				order[i].attack(order[players])
+		print('killed:', order[i].killed)
+		print('damaged:', order[i].damaged)
+		print('miss:', order[i].miss)
 
-				
+		input()
+
+print('Победил {}'.format(('p1', 'p2')[winner]))

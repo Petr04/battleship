@@ -1,6 +1,6 @@
 from random import choice
 
-from interface import Result
+from result import Result
 from near import near_group
 from invert import invert
 
