@@ -1,6 +1,6 @@
 from random import choice
 
-from interface import Result
+from result import Result
 from near import near_group
 from invert import invert
 
@@ -20,9 +20,9 @@ class Gameboard:
 			for j in range(self.y-1):
 				self.all.add((i, j))
 
-		self.fail = False # Для информации
+		self.fail = False # Для лога
 
-	def __repr__(self):
+	def __str__(self):
 		ret = ''
 		for i in range(self.x):
 			for j in range(self.y):

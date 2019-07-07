@@ -1,5 +1,5 @@
 from gameboard import Gameboard
-from interface import Result
+from result import Result
 
 p1 = Gameboard()
 p2 = Gameboard()
