@@ -1,18 +1,16 @@
-from near import near
 from numpy import full
 
 class DifferentSize(Exception):
 	pass
 
 class Field:
-	def __init__(self, x, y, elements=set()):
-		self.x = x
-		self.y = y
+	def __init__(self, size, elements=set()):
+		self.size = size
 
-		self.field = full((self.x, self.y), False)
+		self.field = full(self.size, False)
 		if elements:
-			for i in range(self.x):
-				for j in range(self.y):
+			for i in range(self.size[0]):
+				for j in range(self.size[1]):
 					self.field[i][j] = (i, j) in elements
 
 	def __str__(self):
@@ -26,22 +24,21 @@ class Field:
 		return ret
 
 	def __eq__(self, other):
-		for i in (self.field, other.field), (self.x, other.x), (self,y, other.y):
-			if i[0] != i[1]:
-				return False
+		if self.field == other.field:
+			return True
 
-		return True
+		return False
 
 	def __logic(self, other, operation):
-		if (self.x, self.y) != (other.x, other.y):
+		if self.size != other.size:
 			raise DifferentSize("""a, b in a {} b must have same size, but \
 a is {}x{}, b is {}x{}""".format(operation, self.x, self.y, other.x, other.y))
 
-		ret = Field(self.x, self.y)
+		ret = Field(self.size)
 
-		for i in range(self.x):
+		for i in range(self.size[0]):
 
-			for j in range(self.y):
+			for j in range(self.size[1]):
 				ret.field[i][j] = eval('self.field[i][j] {} other.field[i][j]'.format(operation))
 
 		return ret
@@ -66,33 +63,32 @@ a is {}x{}, b is {}x{}""".format(operation, self.x, self.y, other.x, other.y))
 		return ret
 
 	def near(self, base, diagonals):
-		# Не работает
-		ret = Field(self.x, self.y)
+		ret = Field(self.size)
 
-		for i in range(self.x):
-			for j in range(self.y):
-				if self.field[i][j]:
-					delta = (-1, 0, 1)
+		for i in range(self.size[0]):
+			for j in range(self.size[1]):
 
-					for delta_i in delta:
-						for delta_j in delta:
-							if not( (not diagonals) and (not 0 in (i, j)) ):
-								if not( (not base) and all(d == 0 for d in (delta_i, delta_j)) ):
-									near_i = i + delta_i
-									near_j = j + delta_j
+				if not self.field[i][j]:
+					continue
 
-									within = True
-									check = zip((near_i, near_j), (self.x, self.y))
-									for c in check:
-										if not( 0 <= c[0] <= c[1] ):
-											within = False
+				d = (-1, 0, 1)
+				for d_i in d:
+					for d_j in d:
 
-									if within:
-										ret.field[near_i][near_j] = True
+						new_i, new_j = [sum(pair) for pair in zip((i, j), (d_i, d_j))]
+
+						for new, s in zip((new_i, new_j), self.size):
+							if new not in range(s):
+								break
+						else:
+							if (not base) and (d_i == d_j == 0):
+								continue
+
+							ret.field[new_i][new_j] = True
 
 		return ret
 
-f = Field(10, 10, {(1, 1), (1, 2), (3, 4), (4, 4), (4, 3), (0, 6)})
+f = Field((10, 10), {(1, 1), (1, 2), (3, 4), (4, 4), (4, 3), (0, 6)})
 print(f)
 print('=====')
 print(f.near(base=False, diagonals=False))
