@@ -1,13 +1,10 @@
-from numpy import full
-
-class DifferentSize(Exception):
-	pass
+import numpy as np
 
 class Field:
 	def __init__(self, size, elements=set()):
 		self.size = size
 
-		self.field = full(self.size, False)
+		self.field = np.full(self.size, False)
 		if elements:
 			for i in range(self.size[0]):
 				for j in range(self.size[1]):
@@ -31,7 +28,7 @@ class Field:
 
 	def __logic(self, other, operation):
 		if self.size != other.size:
-			raise DifferentSize("""a, b in a {} b must have same size, but \
+			raise ValueError("""a, b in a {} b must have same size, but \
 a is {}x{}, b is {}x{}""".format(operation, self.x, self.y, other.x, other.y))
 
 		ret = Field(self.size)
@@ -81,7 +78,8 @@ a is {}x{}, b is {}x{}""".format(operation, self.x, self.y, other.x, other.y))
 							if new not in range(s):
 								break
 						else:
-							if (not base) and (d_i == d_j == 0):
+							if ( (not base) and self.field[new_i][new_j] ) or \
+								( (not diagonals) and (0 not in (d_i, d_j)) ) :
 								continue
 
 							ret.field[new_i][new_j] = True
@@ -91,4 +89,4 @@ a is {}x{}, b is {}x{}""".format(operation, self.x, self.y, other.x, other.y))
 f = Field((10, 10), {(1, 1), (1, 2), (3, 4), (4, 4), (4, 3), (0, 6)})
 print(f)
 print('=====')
-print(f.near(base=False, diagonals=False))
+print(f.near(base=False, diagonals=True))
