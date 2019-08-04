@@ -1,8 +1,6 @@
 from random import choice
 
 from result import Result
-from near import near_group
-from invert import invert
 
 class Gameboard:
 	def __init__(self, x=10, y=10):
@@ -19,8 +17,6 @@ class Gameboard:
 		for i in range(self.x-1):
 			for j in range(self.y-1):
 				self.all.add((i, j))
-
-		self.fail = False # Для информации
 
 	def __repr__(self):
 		ret = ''
@@ -70,8 +66,6 @@ class Gameboard:
 		else:
 			x, y = choice(list( near_group(self.damaged, diagonals=False,
 				base=False) - empty ))
-
-		print(' на {}: {}'.format((x, y), (x, y) in enemy.field)) # Для test.py (ходит на ...)
 
 		if not (x, y) in enemy.field:
 			self.miss.add((x, y))
