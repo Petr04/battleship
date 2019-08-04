@@ -4,7 +4,10 @@ from result import Result
 from near import near_group
 from invert import invert
 
-class Gameboard:
+class Player:
+	# Заменить set на Field
+	# Сделать метод, который принимает клетку, которую атакуешь, и возвращает результат
+	# Сделать приватными некоторые члены класса (например, self.field)
 	def __init__(self, x=10, y=10):
 		self.field = set()
 
@@ -65,13 +68,14 @@ class Gameboard:
 
 	def attack(self, enemy):
 		empty = (self.miss | near_group(self.killed, diagonals=True, base=True))
+
+		print(empty, self.all - empty, sep='\n')
+
 		if not self.damaged:
 			x, y = choice(list( enemy.all - empty ))
 		else:
 			x, y = choice(list( near_group(self.damaged, diagonals=False,
 				base=False) - empty ))
-
-		print(' на {}: {}'.format((x, y), (x, y) in enemy.field)) # Для test.py (ходит на ...)
 
 		if not (x, y) in enemy.field:
 			self.miss.add((x, y))
@@ -79,13 +83,17 @@ class Gameboard:
 
 		self.damaged.add((x, y))
 		if len( near_group(self.damaged, diagonals=False, base=False) & enemy.field ) != 0:
-			self.damaged.add((x, y))
 			return Result.DAMAGE
 
-
-		print(self.damaged)
 		self.killed |= self.damaged
 		self.damaged = set()
+
+		# values = (
+		# 	'empty', 'empty == self.all'
+		# )
+
+		# for out in values:
+		# 	print('{}: {}'.format(out, eval(out)))
 
 		if self.killed == enemy.field:
 			return Result.WIN
