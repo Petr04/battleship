@@ -1,12 +1,13 @@
 from random import choice
 
+from field import Field
 from result import Result
 
-class Gameboard:
-	def __init__(self, x=10, y=10):
-		self.field = set()
+class Player:
+	def __init__(self, size):
+		self.field = Field(size)
 
-		self.killed = set()
+		self.killed = Field(size)
 		self.damaged = set()
 		self.miss = set()
 

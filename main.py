@@ -1,8 +1,8 @@
-from gameboard import Gameboard
+from player import Player
 from result import Result
 
-p1 = Gameboard()
-p2 = Gameboard()
+p1 = Player()
+p2 = Player()
 
 p1.generate()
 p2.generate()

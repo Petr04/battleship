@@ -1,8 +1,10 @@
 import numpy as np
+import random
 
 class Field:
-	def __init__(self, size, elements=set()):
+	def __init__(self, size, ship_count=4, elements=set()):
 		self.size = size
+		self.ship_count = ship_count
 
 		self.field = np.full(self.size, False)
 		if elements:
@@ -20,35 +22,6 @@ class Field:
 
 		return ret
 
-	def __eq__(self, other):
-		if self.field == other.field:
-			return True
-
-		return False
-
-	def __logic(self, other, operation):
-		if self.size != other.size:
-			raise ValueError("""a, b in a {} b must have same size, but \
-a is {}x{}, b is {}x{}""".format(operation, self.x, self.y, other.x, other.y))
-
-		ret = Field(self.size)
-
-		for i in range(self.size[0]):
-
-			for j in range(self.size[1]):
-				ret.field[i][j] = eval('self.field[i][j] {} other.field[i][j]'.format(operation))
-
-		return ret
-
-	def __and__(self, other):
-		return self.__logic(other, '&')
-
-	def __or__(self, other):
-		return self.__logic(other, '|')
-
-	def __xor__(self, other):
-		return self.__logic(other, '^')
-
 	def elements(self):
 		ret = set()
 
@@ -58,6 +31,9 @@ a is {}x{}, b is {}x{}""".format(operation, self.x, self.y, other.x, other.y))
 					ret.add((i, j))
 
 		return ret
+
+	def clear(self):
+		self.field = np.full(self.size, False)
 
 	def near(self, base, diagonals):
 		ret = Field(self.size)
@@ -86,7 +62,35 @@ a is {}x{}, b is {}x{}""".format(operation, self.x, self.y, other.x, other.y))
 
 		return ret
 
-f = Field((10, 10), {(1, 1), (1, 2), (3, 4), (4, 4), (4, 3), (0, 6)})
-print(f)
-print('=====')
-print(f.near(base=False, diagonals=True))
+	def generate(self):
+		bad = set()
+
+		for ship_type in range(self.ship_count, 0, -1):
+			ship_instance = 0
+			while ship_instance < self.ship_count - ship_type + 1:
+
+				first_set = invert(near_group(self.field, base=True, diagonals=True) | bad)
+				if not first_set: # Протестировать
+					self.generate()
+					return
+
+				new = {random.choice(list(first_set))}
+
+				for _ in range(ship_type-1):
+					cells = near_group(new, base=False, diagonals=False) - \
+						(bad | near_group(self.field, base=True, diagonals=True))
+					if not cells:
+						ship_instance -= 1
+						bad |= new
+						new.clear()
+						break
+
+					new.add(choice(list(cells)))
+
+				self.field |= new
+				ship_instance += 1
+
+if __name__ == '__main__':
+	f = Field((10, 10))
+	f.generate()
+	print(f)
