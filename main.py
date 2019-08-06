@@ -1,8 +1,10 @@
 from player import Player
 from result import Result
 
-p1 = Player()
-p2 = Player()
+size = (10, 10)
+
+p1 = Player(size)
+p2 = Player(size)
 
 p1.generate()
 p2.generate()

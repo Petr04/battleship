@@ -25,6 +25,7 @@ class Field:
 	def elements(self):
 		ret = set()
 
+				ret += (' ', 'X')[int(j)]
 		for i in self.field:
 			for j in i:
 				if j:
@@ -63,29 +64,34 @@ class Field:
 		return ret
 
 	def generate(self):
-		bad = set()
+		bad = numpy.array()
 
 		for ship_type in range(self.ship_count, 0, -1):
 			ship_instance = 0
 			while ship_instance < self.ship_count - ship_type + 1:
 
-				first_set = invert(near_group(self.field, base=True, diagonals=True) | bad)
-				if not first_set: # Протестировать
+				first_set = Field(self.size)
+				first_set.field = ~(self.near(base=True, diagonals=True) | bad)
+				if first_set.size == 0: # Протестировать
 					self.generate()
 					return
 
 				new = {random.choice(list(first_set))}
+				new = Field(self.size)
+				new.field[random.choice(list(first_set))] = True
 
 				for _ in range(ship_type-1):
-					cells = near_group(new, base=False, diagonals=False) - \
-						(bad | near_group(self.field, base=True, diagonals=True))
-					if not cells:
+
+					cells = new.near(base=False, diagonals=False) - \
+						(bad | self.near(base=True, diagonals=True))
+
+					if cells.size == 0:
 						ship_instance -= 1
 						bad |= new
 						new.clear()
 						break
 
-					new.add(choice(list(cells)))
+					new[random.choice(list(cells))] = True
 
 				self.field |= new
 				ship_instance += 1
