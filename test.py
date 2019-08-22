@@ -18,12 +18,9 @@ while True:
 		print(out)
 
 		if out == Result.WIN:
-			print('\n'*10, 'lol! lol! lol!', '\n'*10)
 			winner = i
 			end = True
 			break
-
-		# print('{0}{1}{0}'.format('\n'*2, '-'*5))
 
 	if end:
 		break

@@ -5,9 +5,6 @@ from near import near_group
 from invert import invert
 
 class Player:
-	# Заменить set на Field
-	# Сделать метод, который принимает клетку, которую атакуешь, и возвращает результат
-	# Сделать приватными некоторые члены класса (например, self.field)
 	def __init__(self, x=10, y=10):
 		self.field = set()
 
@@ -19,11 +16,9 @@ class Player:
 		self.y = y
 
 		self.all = set()
-		for i in range(self.x-1):
-			for j in range(self.y-1):
+		for i in range(self.x):
+			for j in range(self.y):
 				self.all.add((i, j))
-
-		self.fail = False # Для лога
 
 	def __str__(self):
 		ret = ''
@@ -67,9 +62,8 @@ class Player:
 				ship_instance += 1
 
 	def attack(self, enemy):
+		# То, куда бесполезно стрелять
 		empty = (self.miss | near_group(self.killed, diagonals=True, base=True))
-
-		print(empty, self.all - empty, sep='\n')
 
 		if not self.damaged:
 			x, y = choice(list( enemy.all - empty ))
@@ -87,13 +81,6 @@ class Player:
 
 		self.killed |= self.damaged
 		self.damaged = set()
-
-		# values = (
-		# 	'empty', 'empty == self.all'
-		# )
-
-		# for out in values:
-		# 	print('{}: {}'.format(out, eval(out)))
 
 		if self.killed == enemy.field:
 			return Result.WIN
