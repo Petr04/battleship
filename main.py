@@ -103,8 +103,17 @@ class Field(qw.QWidget):
 
 
 class InputField(Field):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self.selected = set()
+
 	def clicked(self):
+		self.selected.add(self.sender().coord)
 		self.sender().toggle((CellStatus.NORMAL, CellStatus.SHIP))
+
+	def getField(self):
+		return self.selected
 
 
 class EnemyField(Field):
@@ -123,17 +132,60 @@ class EnemyField(Field):
 			i.toggle((CellStatus.NORMAL, CellStatus.DAMAGED))
 
 
+class FieldDialog(qw.QDialog):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self.f = InputField((10, 10))
+
+		buttons = qw.QDialogButtonBox(
+			qw.QDialogButtonBox.Ok | qw.QDialogButtonBox.Cancel,
+			qc.Qt.Horizontal, self
+		)
+
+		buttons.accepted.connect(self.accept)
+		buttons.rejected.connect(self.reject)
+
+		vbox = qw.QVBoxLayout()
+		vbox.addWidget(self.f)
+		vbox.addWidget(buttons)
+
+		self.setLayout(vbox)
+
+
+	def field(self):
+		return self.f.getField()
+
+	@staticmethod
+	def getField(*args, **kwargs):
+		dialog = FieldDialog(*args, **kwargs)
+		result = dialog.exec_()
+		field = dialog.field()
+		return (field, result == qw.QDialog.Accepted)
+
+
 class MainWindow(qw.QMainWindow):
 	def __init__(self):
 		super().__init__()
 
 		w = qw.QWidget()
-		vbox = qw.QVBoxLayout()
 
-		f = Field((10, 10), self)
-		vbox.addWidget(f)
+		f, ok = FieldDialog.getField(self)
+
+		if not ok:
+			sys.exit(0)
+
+		field = Field((10, 10), self)
+		for i in field.cells:
+			for j in i:
+				if j.coord in f:
+					j.setStatus(CellStatus.SHIP)
+
+		vbox = qw.QVBoxLayout()
+		vbox.addWidget(field)
 
 		w.setLayout(vbox)
+
 		self.setCentralWidget(w)
 		self.show()
 
