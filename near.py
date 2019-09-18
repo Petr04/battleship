@@ -1,4 +1,4 @@
-def near(cell, diagonals, base, x=10, y=10): # Сделать параметры обязательными
+def near(cell, diagonals, base, x=10, y=10):
 	ret = set()
 	delta = (-1, 0, 1)
 	for i in delta:
