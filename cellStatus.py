@@ -7,4 +7,4 @@ class CellStatus(enum.Enum):
 	SHIP = QColor(Qt.black)
 	MISS = QColor(Qt.blue)
 	DAMAGED = QColor(Qt.red)
-	KILILED = QColor(Qt.darkRed)
+	KILLED = QColor(Qt.darkRed)

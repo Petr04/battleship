@@ -26,16 +26,4 @@ class InputField(Field):
 
 
 class EnemyField(Field):
-	def clicked(self):
-		cell = self.sender()
-
-		nearCoords = near.near(
-			cell.coord,
-			diagonals=False,
-			base=True
-		)
-
-		nearCells = [self.cells[i[0]][i[1]] for i in nearCoords]
-
-		for i in nearCells:
-			i.toggle((CellStatus.NORMAL, CellStatus.DAMAGED))
+	pass

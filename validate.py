@@ -1,22 +1,29 @@
+from near import near_group
 from split2ships import split2ships
 
-from pprint import pprint
+def diagonals(ship):
+	return near_group(ship, base=False, diagonals=True) - \
+		near_group(ship, base=False, diagonals=False)
 
 def get_count(ships):
 	count = {}
 
-	l = len(ships[0])
-	s = list( filter(lambda x: len(x) == l, ships) )
+	for i in ships:
+		l = len(i)
 
-	count[l] = len(s)
-
-	if len(s) > 1:
-		upd = get_count(list( filter(lambda x: x not in s, ships) ))
-		count.update(upd)
+		if l not in count:
+			count[l] = 1
+		else:
+			count[l] += 1
 
 	return count
 
 def check_diagonals(ships):
+	for i in ships:
+		for j in ships:
+			if len( diagonals(i) & j ) != 0:
+				return False
+
 	return True
 
 def validate(cells, count):
@@ -25,11 +32,7 @@ def validate(cells, count):
 	return (count == get_count(ships)) and check_diagonals(ships)
 
 if __name__ == '__main__':
-	cells = {(4, 7), (2, 8), (0, 2), (2, 1), (4, 0), (4, 4), (0, 4),
-		(4, 1), (0, 0), (2, 6), (4, 5), (2, 3), (4, 2), (0, 8),
-		(2, 7), (4, 6), (0, 6), (2, 0), (0, 9), (2, 4)}
-
+	cells = {(0, 1), (3, 2), (1, 5), (1, 6), (2, 3), (2, 2), (1, 0), (1, 1)}
 	ships = split2ships(cells)
-	pprint(ships)
 
-	print(get_count(list(ships)))
+	print(check_diagonals(ships))
