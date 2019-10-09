@@ -8,10 +8,11 @@ import validate
 
 
 class FieldDialog(qw.QDialog):
-	def __init__(self, *args, **kwargs):
+	def __init__(self, validate, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
 		self.f = InputField((10, 10))
+		self.validate = validate
 
 		buttons = qw.QDialogButtonBox(
 			qw.QDialogButtonBox.Ok | qw.QDialogButtonBox.Cancel,
@@ -32,22 +33,26 @@ class FieldDialog(qw.QDialog):
 		return self.f.getField()
 
 	def ok(self):
-		v = validate.validate(self.field(), {i: 5-i for i in range(1, 5)})
-
-		print(self.field())
-
-		if v:
+		if not self.validate:
 			self.accept()
 		else:
-			msg = qw.QMessageBox(self)
-			msg.setIcon(qw.QMessageBox.Warning)
-			msg.setText('Your field is invalid')
-			msg.exec_()
+
+			v = validate.validate(self.field(), {i: 5-i for i in range(1, 5)})
+
+			print(self.field())
+
+			if v:
+				self.accept()
+			else:
+				msg = qw.QMessageBox(self)
+				msg.setIcon(qw.QMessageBox.Warning)
+				msg.setText('Your field is invalid')
+				msg.exec_()
 
 	@staticmethod
-	def getField(*args, **kwargs):
+	def getField(validate, *args, **kwargs):
 
-		dialog = FieldDialog(*args, **kwargs)
+		dialog = FieldDialog(validate, *args, **kwargs)
 
 		result = dialog.exec_()
 		field = dialog.field()

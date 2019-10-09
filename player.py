@@ -5,25 +5,24 @@ from near import near_group
 from invert import invert
 
 class Player:
-	def __init__(self, x=10, y=10):
+	def __init__(self, size):
 		self.field = set()
 
 		self.killed = set()
 		self.damaged = set()
 		self.miss = set()
 
-		self.x = x
-		self.y = y
+		self.size = size
 
 		self.all = set()
-		for i in range(self.x):
-			for j in range(self.y):
+		for i in range(self.size[0]):
+			for j in range(self.size[1]):
 				self.all.add((i, j))
 
 	def __str__(self):
 		ret = ''
-		for i in range(self.x):
-			for j in range(self.y):
+		for i in range(self.size[0]):
+			for j in range(self.size[1]):
 				if (i, j) in self.field:
 					ret += 'X'
 				else:
