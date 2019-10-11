@@ -15,17 +15,17 @@ class MainWindow(qw.QMainWindow):
 
 		w = qw.QWidget()
 
-		f, ok = FieldDialog.getField(False, self)
+		# field, myFirst, ok = FieldDialog.getField(False, self)
+		field = {(2, 8), (7, 7), (2, 1), (8, 9), (9, 4), (5, 1), (2, 5), (5, 8), (1, 2), (5, 5), (8, 1), (1, 5), (2, 2), (2, 6), (2, 3), (6, 5), (3, 8), (1, 8), (5, 2), (8, 4)}
+		myFirst = False
+		ok = True
 
 		if not ok:
 			sys.exit(0)
 
-		gb = Gameboard((10, 10), self)
+		gb = Gameboard((10, 10), myFirst, self)
 
-		gb.me.player.field = f
-		gb.enemy.player.damaged = {(2, 1), (3, 3)}
-		gb.me.updateCells(field=True)
-		gb.enemy.updateCells(field=False)
+		gb.me.player.field = field
 
 		vbox = qw.QVBoxLayout()
 		vbox.addWidget(gb)

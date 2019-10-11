@@ -60,7 +60,7 @@ class Player:
 				self.field |= new
 				ship_instance += 1
 
-	def attack(self, enemy):
+	def optimal_cell(self, enemy):
 		# То, куда бесполезно стрелять
 		empty = (self.miss | near_group(self.killed, diagonals=True, base=True))
 
@@ -69,6 +69,11 @@ class Player:
 		else:
 			x, y = choice(list( near_group(self.damaged, diagonals=False,
 				base=False) - empty ))
+
+		return (x, y)
+
+	def attack(self, enemy, cell):
+		x, y = cell
 
 		if not (x, y) in enemy.field:
 			self.miss.add((x, y))

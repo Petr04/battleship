@@ -4,9 +4,17 @@ from PyQt5 import QtCore as qc
 
 from field import Field
 from cellStatus import CellStatus
+from result import Result
 
 import numpy as np
 from player import Player
+
+
+result_status = {
+	Result.MISS: CellStatus.MISS,
+	Result.DAMAGE: CellStatus.DAMAGED,
+	Result.KILL: CellStatus.KILLED
+}
 
 
 class InputField(Field):
@@ -33,16 +41,17 @@ class GameField(Field):
 		self.player = Player(size)
 
 	def updateCells(self, field):
-		d = {
-			self.player.killed: CellStatus.KILLED,
-			self.player.damaged: CellStatus.DAMAGED,
-			self.player.miss: CellStatus.MISS
-		}
+		# damaged и killed должны отображаться на противоположном поле
+		l = [
+			(self.player.killed, CellStatus.KILLED),
+			(self.player.damaged, CellStatus.DAMAGED),
+			(self.player.miss, CellStatus.MISS)
+		]
 
 		if field:
-			d[self.player.field] = CellStatus.SHIP
+			l.append((self.player.field, CellStatus.SHIP))
 
-		for t, st in d:
+		for t, st in l:
 			for i in t:
 				self.cells[i[0]][i[1]].setStatus(st)
 
@@ -53,16 +62,18 @@ class EnemyField(GameField):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
-		self.clicked_cell = None
+		self.clickedCell = None
 
 	def clicked(self):
-		self.clicked_cell = self.sender()
+		self.clickedCell = self.sender()
 		self.clickedSignal.emit()
 
 
 class Gameboard(qw.QWidget):
-	def __init__(self, size, *args, **kwargs):
+	def __init__(self, size, myFirst, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+
+		self.myCurrent = myFirst
 
 		self.me = GameField(size, self)
 		self.enemy = EnemyField(size, self)
@@ -77,10 +88,36 @@ class Gameboard(qw.QWidget):
 
 		self.setLayout(vbox)
 
+		if not self.myCurrent:
+			self.move()
 
-	def enemyMove(self):
-		# self.enemy.player.attack(me)
-		pass
+
+	def move(self, c=None):
+		myCurrentOld = self.myCurrent
+		self.myCurrent = not self.myCurrent
+
+		if myCurrentOld:
+			me = self.me
+			enemy = self.enemy
+		else:
+			me = self.enemy
+			enemy = self.me
+
+		if not c:
+			c = me.player.optimal_cell(enemy.player)
+
+		ret = me.player.attack(enemy.player, c)
+
+		if ret in result_status:
+			enemy.cells[c[0]][c[1]].setStatus(result_status[ret])
+			if myCurrentOld:
+				self.move()
+		else:
+			if myCurrentOld:
+				print('You win')
+			else:
+				print('Computer wins')
 
 	def clicked(self):
-		pass
+		if self.myCurrent:
+			self.move(c=self.sender().clickedCell.coord)
