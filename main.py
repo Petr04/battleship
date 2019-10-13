@@ -3,7 +3,8 @@ from PyQt5 import QtWidgets as qw
 
 from cellStatus import CellStatus
 from field import Field
-from customField import EnemyField, Gameboard
+from customField import EnemyField
+from gameboard import Gameboard
 from fieldDialog import FieldDialog
 
 from player import Player
@@ -24,8 +25,11 @@ class MainWindow(qw.QMainWindow):
 			sys.exit(0)
 
 		gb = Gameboard((10, 10), myFirst, self)
+		gb.win.connect(self.win)
+		gb.lose.connect(self.lose)
 
 		gb.me.player.field = field
+		gb.me.updateCells(gb.enemy, True)
 
 		vbox = qw.QVBoxLayout()
 		vbox.addWidget(gb)
@@ -33,6 +37,19 @@ class MainWindow(qw.QMainWindow):
 
 		self.setCentralWidget(w)
 		self.show()
+
+
+	def winLose(self, win):
+		msg = qw.QMessageBox(self)
+		msg.setIcon(qw.QMessageBox.Information)
+		msg.setText('You {}'.format(['lose', 'win'][win]))
+		msg.exec_()
+
+	def win(self):
+		self.winLose(win=True)
+
+	def lose(self):
+		self.winLose(win=False)
 
 
 if __name__ == '__main__':
