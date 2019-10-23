@@ -16,10 +16,10 @@ class MainWindow(qw.QMainWindow):
 
 		w = qw.QWidget()
 
-		# field, myFirst, ok = FieldDialog.getField(False, self)
-		field = {(2, 8), (7, 7), (2, 1), (8, 9), (9, 4), (5, 1), (2, 5), (5, 8), (1, 2), (5, 5), (8, 1), (1, 5), (2, 2), (2, 6), (2, 3), (6, 5), (3, 8), (1, 8), (5, 2), (8, 4)}
-		myFirst = False
-		ok = True
+		field, myFirst, ok = FieldDialog.getField(True, self)
+#		field = {(2, 8), (7, 7), (2, 1), (8, 9), (9, 4), (5, 1), (2, 5), (5, 8), (1, 2), (5, 5), (8, 1), (1, 5), (2, 2), (2, 6), (2, 3), (6, 5), (3, 8), (1, 8), (5, 2), (8, 4)}
+#		myFirst = False
+#		ok = True
 
 		if not ok:
 			sys.exit(0)
@@ -42,7 +42,7 @@ class MainWindow(qw.QMainWindow):
 	def winLose(self, win):
 		msg = qw.QMessageBox(self)
 		msg.setIcon(qw.QMessageBox.Information)
-		msg.setText('You {}'.format(['lose', 'win'][win]))
+		msg.setText('Вы {}'.format(['проиграли', 'выиграли'][win]))
 		msg.exec_()
 
 	def win(self):
